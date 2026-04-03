@@ -27,12 +27,20 @@ The project already has documentation. Your job is to find it, categorize it, an
 
 ### Step 1: Scan for documentation files
 
-Search the repo for documentation files. Look for:
-- Markdown files (`.md`) in common locations: `docs/`, `wiki/`, `dev-docs/`, `.claude/rules/`, project root
-- README files at any level
-- ADR directories
-- Contributing guides, style guides, convention docs
-- Config documentation
+
+Search the repo for documentation files. Do NOT use a single unscoped recursive glob like `**/*.md` from the project root, as results will be dominated and truncated by dependency directories.
+
+**Search strategy (in this order):**
+
+1. **Project root first:** `Glob("*.md", path=projectRoot)` to catch top-level docs like README.md, DEPLOY.md, CONTRIBUTING.md, etc. These are the most commonly missed.
+2. **Known doc directories:** Glob `**/*.md` scoped within each of: `docs/`, `wiki/`, `dev-docs/`, `.github/`, `.claude/rules/`, and any `adr/` or `adrs/` directory.
+3. **Catch-all with exclusions:** Use Bash with `find` to locate remaining markdown files while excluding dependency and build directories. Exclude paths containing: `node_modules`, `.git`, `vendor`, `build`, `dist`, `__pycache__`, `.venv`, `venv`, and `.claude/commands`. Compare against files already found in steps 1-2 to identify docs in unexpected locations.
+
+**Look for:**
+- README files, contributing guides, style guides, convention docs
+- Architecture and design documents
+- Config documentation, deployment guides
+- ADR (Architecture Decision Record) files
 
 **Be conservative.** Exclude:
 - Files inside `node_modules/`, `.git/`, `vendor/`, `build/`, `dist/`, `__pycache__/`, `.venv/`, `venv/`
@@ -40,6 +48,7 @@ Search the repo for documentation files. Look for:
 - Changelog/release notes (unless specifically about architecture or conventions)
 - Auto-generated docs
 - Package README files that aren't project documentation
+- Tandem skill/command templates (`.claude/commands/`)
 
 For large repos with many markdown files, prioritize: architecture docs, API docs, convention/style guides, ADRs, READMEs, and contribution guides. If you find more than 20 documentation files, ask the developer: "I found [N] markdown files. Want me to include all of them, or should I focus on the most important ones?"
 

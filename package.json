@@ -1,6 +1,6 @@
 {
   "name": "@tandemdev/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A suite of Claude Code commands that guide developers through the full lifecycle of building software. Ownership and speed, not ownership or speed.",
   "bin": {
     "tandem": "bin/tandem.js"
