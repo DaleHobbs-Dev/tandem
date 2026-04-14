@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AskUserQuestion Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f1e8;
+      --panel: #fffdf8;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --accent-soft: #d1fae5;
+      --border: #d6d3d1;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, #efe6d7 0, transparent 40%),
+        linear-gradient(180deg, #f8f4ec 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(720px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    fieldset {
+      border: 0;
+      padding: 0;
+      margin: 24px 0 0;
+    }
+
+    legend {
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .option {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color 120ms ease, background-color 120ms ease, transform 120ms ease;
+      background: #fff;
+    }
+
+    .option:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .option input {
+      margin-right: 10px;
+    }
+
+    .option-title {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .option-description {
+      display: block;
+      margin-left: 28px;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .other-box {
+      display: none;
+      margin-top: 8px;
+      margin-left: 28px;
+    }
+
+    .other-box textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font: inherit;
+      resize: vertical;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: #e7e5e4;
+      color: var(--text);
+    }
+
+    pre {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 14px;
+      background: #111827;
+      color: #e5e7eb;
+      overflow: auto;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>AskUserQuestion Demo</h1>
+    <p>
+      This is a local reference implementation of the kind of structured question UI
+      Tandem appears to expect from Claude Code. Pick one option, or choose
+      <strong>Other</strong> to reveal a text box for a custom answer.
+    </p>
+
+    <form id="question-form">
+      <fieldset>
+        <legend>Which architecture mode should we use?</legend>
+
+        <label class="option" for="design">
+          <input id="design" type="radio" name="mode" value="design">
+          <span class="option-title">Design a new system</span>
+          <span class="option-description">Use this when you are planning a brand new project from scratch.</span>
+        </label>
+
+        <label class="option" for="reverse-engineer">
+          <input id="reverse-engineer" type="radio" name="mode" value="reverse-engineer">
+          <span class="option-title">Map an existing codebase</span>
+          <span class="option-description">Use this when the code already exists and you want to understand it.</span>
+        </label>
+
+        <label class="option" for="migration">
+          <input id="migration" type="radio" name="mode" value="migration">
+          <span class="option-title">Plan a migration</span>
+          <span class="option-description">Use this when you are evolving an existing system toward a new target state.</span>
+        </label>
+
+        <label class="option" for="other">
+          <input id="other" type="radio" name="mode" value="other">
+          <span class="option-title">Other</span>
+          <span class="option-description">Describe the exact workflow you want instead of choosing one of the preset options.</span>
+
+          <div id="other-box" class="other-box">
+            <textarea
+              id="other-text"
+              placeholder="Describe what you want in your own words..."
+            ></textarea>
+          </div>
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button class="primary" type="submit">Submit Answer</button>
+        <button class="secondary" type="button" id="reset-button">Reset</button>
+      </div>
+    </form>
+
+    <pre id="output">Submit the form to see the structured result.</pre>
+  </main>
+
+  <script>
+    const form = document.getElementById("question-form");
+    const options = Array.from(document.querySelectorAll(".option"));
+    const radioButtons = Array.from(document.querySelectorAll("input[name='mode']"));
+    const otherRadio = document.getElementById("other");
+    const otherBox = document.getElementById("other-box");
+    const otherText = document.getElementById("other-text");
+    const output = document.getElementById("output");
+    const resetButton = document.getElementById("reset-button");
+
+    function updateUi() {
+      options.forEach((option) => {
+        const input = option.querySelector("input");
+        option.classList.toggle("selected", input.checked);
+      });
+
+      const showOther = otherRadio.checked;
+      otherBox.style.display = showOther ? "block" : "none";
+
+      if (!showOther) {
+        otherText.value = "";
+      }
+    }
+
+    radioButtons.forEach((radio) => {
+      radio.addEventListener("change", updateUi);
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const selected = radioButtons.find((radio) => radio.checked);
+
+      if (!selected) {
+        output.textContent = "No option selected yet.";
+        return;
+      }
+
+      const result = {
+        question: "Which architecture mode should we use?",
+        selectedOption: selected.value,
+        customAnswer: selected.value === "other" ? otherText.value.trim() : ""
+      };
+
+      output.textContent = JSON.stringify(result, null, 2);
+    });
+
+    resetButton.addEventListener("click", () => {
+      radioButtons.forEach((radio) => {
+        radio.checked = false;
+      });
+      otherText.value = "";
+      output.textContent = "Submit the form to see the structured result.";
+      updateUi();
+    });
+
+    updateUi();
+  </script>
+</body>
+</html>

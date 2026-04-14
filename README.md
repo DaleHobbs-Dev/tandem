@@ -2,7 +2,7 @@
 
 AI coding agents make developers faster. But speed creates a trap: the faster you ship, the less you understand what you shipped. Developers end up staring at code they can't explain, making architectural decisions they can't defend, and building on foundations they don't fully grasp.
 
-Specs and documentation don't fix this. You can have a perfect PRD and still not understand how the code implements it.
+Specs and documentation don't fix this. You can have a perfect PRD (Product Requirements Document) and still not understand how the code implements it.
 
 **Tandem is pair programming that teaches.** A suite of Claude Code commands that guide you through the full lifecycle of building software, from planning through implementation, with a more experienced developer sitting next to you. You move fast and you understand what you built.
 
@@ -10,30 +10,48 @@ Ownership and speed. Not ownership or speed.
 
 ## Install
 
+### Published npm package
+
 ```bash
 npx @tandemdev/cli init
 ```
 
-This copies Tandem's commands to `.claude/commands/` and templates to `.tandem/templates/`. No global installs, no dependencies, no build step.
+This runs the published `@tandemdev/cli` package from npm, maintained by Valerie Freeman, and copies Tandem's commands to `.claude/commands/` and templates to `.tandem/templates/`. No global installs, no dependencies, no build step.
 
 To update to the latest version, run the same command again. Your project's `tandem.json` and documentation are never overwritten.
+
+### Local fork or cloned version
+
+If you have forked or cloned Tandem and want to run your personalized version without publishing it to npm, run the CLI file from your project root and point to your local clone:
+
+```bash
+cd ~/workspace/gamerrater-client
+node ~/workspace/tandem/bin/tandem.js init
+```
+
+In this example:
+
+- `~/workspace/gamerrater-client` is the project you want to install Tandem into
+- `~/workspace/tandem` is your local cloned or forked Tandem repo
+
+The CLI installs into your current working directory, so run the command from the root of the project where you want `.claude/commands/` and `.tandem/templates/` created.
 
 ## Commands
 
 | Command | Purpose | Project Types |
-|---|---|---|
+| --- | --- | --- |
 | `/create-manifest` | Generate or update the `tandem.json` project manifest | All |
-| `/create-prd` | Generate a PRD from a project idea | Greenfield |
+| `/create-prd` | Generate a PRD from a project idea | New projects |
 | `/create-architecture` | Generate or reverse-engineer a technical architecture doc | All |
-| `/create-roadmap` | Generate an ordered implementation plan from PRD | Greenfield |
-| `/create-issues` | Convert roadmap steps into GitHub issues | Greenfield |
+| `/create-roadmap` | Generate an ordered implementation plan from PRD | New projects |
+| `/create-issues` | Convert roadmap steps into GitHub issues | New projects |
 | `/pair-program` | Guided implementation with understanding checks | All |
 | `/update-docs` | Update documentation when decisions change | All |
 | `/create-adr` | Record an architecture decision | All |
 
-## Quick Start: New Project (Greenfield)
+## Quick Start: New Project
 
-```
+```bash
 /create-prd          # Define what you're building and why
 /create-architecture # Design how to build it
 /create-roadmap      # Break it into ordered steps
@@ -42,10 +60,20 @@ To update to the latest version, run the same command again. Your project's `tan
 
 Each command feeds into the next. `/create-prd` produces a PRD, `/create-architecture` reads it to design the system, `/create-roadmap` reads both to plan the work, and `/pair-program` reads everything to guide implementation.
 
-<details>
-<summary><strong>Existing Project (Brownfield)</strong></summary>
+**Note on PRDs:** A PRD, or Product Requirements Document, is a simple document that explains what you are building, who it is for, what problem it solves, and what the first version needs to do. It is useful because it helps you think clearly before writing code, keeps the project focused, and gives both you and the AI a shared definition of what success looks like.
 
-```
+**Note on architecture:** The architecture step is where you decide how the project should be built. This usually includes the main parts of the system, how they connect, where data lives, what frameworks or services you plan to use, and any project-wide conventions that should guide implementation. It is useful because it turns the idea from the PRD into a practical technical plan.
+
+**Note on roadmaps:** A project roadmap breaks the work into a sensible order of steps so you know what to build first, what depends on what, and how to move forward without guessing every time. It is useful because it turns a big project into smaller pieces that are easier to build and review.
+
+**Note on ADRs:** An ADR, or Architecture Decision Record, is a short document that captures an important technical decision, why that decision was made, and what trade-offs were accepted. It is useful because it gives you a written record of why the project took a certain direction, which makes future changes and debugging much easier.
+
+**Note on `AskUserQuestion`:** Some command files reference a tool named `AskUserQuestion`. This repository does not implement that tool itself. It is a Claude Code host-provided capability used for structured prompts, such as radio-button style choices with a small set of direct options and an optional "Other" path for custom input. Running `npx @tandemdev/cli init` only copies Tandem's command and template files into your project. It does not create or install Claude Code's built-in tools.
+
+<details>
+<summary><strong>Existing Project</strong></summary>
+
+```bash
 /create-manifest           # Scan your repo and map existing docs
 /create-architecture       # Reverse-engineer the system (optional, recommended)
 /pair-program fix the auth bug  # Start working
@@ -60,9 +88,9 @@ Each command feeds into the next. `/create-prd` produces a PRD, `/create-archite
 </details>
 
 <details>
-<summary><strong>Migration (Bluefield)</strong></summary>
+<summary><strong>Migration Project</strong></summary>
 
-```
+```bash
 /create-manifest           # Map existing docs
 /create-architecture       # Document current state + target state
 /create-roadmap            # Plan the migration steps
@@ -96,7 +124,7 @@ Every Tandem project has a `tandem.json` file in the project root. It's a table 
 }
 ```
 
-For greenfield projects, creation commands register their output automatically. For existing projects, `/create-manifest` scans the repo and builds it for you. You can also create it by hand using the template at `.tandem/templates/tandem.json` to save the tokens that a full repo scan would cost.
+For new projects, creation commands register their output automatically. For existing projects, `/create-manifest` scans the repo and builds it for you. You can also create it by hand using the template at `.tandem/templates/tandem.json` to save the tokens that a full repo scan would cost.
 
 `/pair-program` uses the manifest to load only docs relevant to the current task, keeping context efficient.
 
@@ -106,7 +134,7 @@ For greenfield projects, creation commands register their output automatically. 
 **Scope** describes which domain a doc covers. `/pair-program` uses this to filter docs by relevance to the current task.
 
 | Value | Use for |
-|---|---|
+| --- | --- |
 | `general` | Docs that apply to the whole project (PRD, architecture, roadmap) |
 | `frontend` | UI components, styling, client-side logic |
 | `backend` | Server, API, business logic |
@@ -121,7 +149,7 @@ Use whatever values fit your project. These are conventions, not a fixed list.
 **Tags** are finer-grained keywords for matching. These conventional tags are searched for by Tandem commands:
 
 | Tag | Used by |
-|---|---|
+| --- | --- |
 | `prd` | `/create-architecture`, `/create-roadmap` look for this to find the PRD |
 | `architecture` | `/pair-program` always loads this; `/create-adr` updates it |
 | `roadmap` | `/pair-program` marks steps complete here; `/create-issues` reads it |

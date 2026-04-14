@@ -1,5 +1,5 @@
 ---
-description: Generate or update the tandem.json project manifest. Scans for existing docs (brownfield) or creates a minimal manifest (greenfield).
+description: Generate or update the tandem.json project manifest. Scans for existing docs or creates a minimal manifest for a new project.
 argument-hint: [scan|init] (optional)
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
@@ -21,7 +21,7 @@ First, determine which mode to use:
 
 3. If the user provided an argument ($ARGUMENTS), respect it: "scan" forces scan mode, "init" forces initialize mode.
 
-## Scan Mode (Brownfield/Bluefield)
+## Scan Mode (Existing Project or Migration Project)
 
 The project already has documentation. Your job is to find it, categorize it, and build the manifest.
 
@@ -90,7 +90,7 @@ Write `tandem.json` to the project root with the reviewed entries:
 }
 ```
 
-## Initialize Mode (Greenfield)
+## Initialize Mode (New Project)
 
 The project is new with no documentation. Create a minimal manifest:
 

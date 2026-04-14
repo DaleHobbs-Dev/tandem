@@ -1,40 +1,69 @@
 ---
-description: Generate an ordered implementation plan from a PRD. Breaks the project into steps with checkboxes that pair-program uses to track progress.
+description: Generate an ordered implementation plan from a PRD. Break the project into clear steps that can be used with /pair-program.
 argument-hint: (no arguments)
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
 # Create Roadmap
 
-You are helping a developer break their project into an ordered implementation plan. Each step becomes a unit of work for `/pair-program`.
+You are helping a developer turn their PRD into a clear, ordered plan.
+
+Each step should be something they can actually sit down and build. These steps will be used directly with `/pair-program`.
+
+---
 
 ## Prerequisites
 
-A PRD must exist. Check `tandem.json` for a doc tagged `prd`. If none exists, tell the developer:
+A PRD must exist.
 
-> "I need a PRD to create a roadmap from. Want to run `/create-prd` first?"
+Check `tandem.json` for a doc tagged `prd`.
+
+If none exists, say:
+
+> "I need a PRD before I can build a roadmap. Want to run `/create-prd` first?"
+
+---
 
 ## Workflow
 
 ### Step 1: Read Context
 
-1. **Read the PRD** (found via manifest, tagged `prd`).
-2. **Read the architecture doc** if one exists (tagged `architecture`). This informs the order and scope of steps.
-3. **Read `~/.claude/CLAUDE.md`** if it has a Developer Profile. The skill tiers (Currently Learning, Deepening, Strong Skills) may lightly inform step ordering: put foundational setup before topics the developer is actively learning, so they have context before hitting unfamiliar territory.
+1. Read the PRD (from the manifest)
+2. Read the architecture doc if it exists (tagged `architecture`)
+3. Read `~/.claude/CLAUDE.md` if there is a Developer Profile
+
+Use this to guide ordering:
+
+- Put setup and foundational work first
+- Do not introduce harder topics too early
+- Build context before complexity
+
+---
 
 ### Step 2: Break Into Steps
 
-Decompose the project into ordered implementation steps. Each step should be:
+Split the project into ordered steps.
 
-- **Ordered by dependency:** What has to exist before what.
-- **Completable in one session:** Roughly 1-4 hours of work per step.
-- **Focused:** Each step has a clear deliverable.
+Think of this like a recipe: what needs to happen first, second, third, etc., so that each step builds on the previous ones.
+Think about the dependencies between tasks: what needs to exist before the next thing can be built? Arrange the steps so that each one sets up the next, just like following a recipe where you prepare ingredients in the right order before cooking.
+Each step should:
 
-Include user stories where applicable. Not every step has them: infrastructure setup, configuration, and refactoring steps often don't map to a user-facing outcome. But for steps that deliver user-visible functionality, user stories ground the work.
+- follow dependencies (what needs to exist first)
+- be doable in one session (roughly 1 to 4 hours)
+- have a clear outcome
+
+Keep steps focused.
+
+If a step feels too big, break it down.
+
+---
 
 ### Step 3: Write the Roadmap
 
-Default location: `dev-docs/ROADMAP.md`, or wherever the developer specifies.
+Default location:
+
+- `dev-docs/ROADMAP.md`
+  (or wherever the developer prefers)
 
 ```markdown
 <!-- Last updated: [date] -->
@@ -47,17 +76,26 @@ Generated from: [PRD path from tandem.json]
 ## Steps
 
 - [ ] **Step 1: [Title]**
-  [Brief description of what this step covers and what the deliverable is]
-  [Reference to architecture component if applicable]
+  [What this step covers and what gets built]
+  [Reference architecture components if helpful]
 
-  **User Stories** (where applicable):
-  - As a [user type], I want to [action] so that [outcome].
+  **User Stories** (only when it makes sense):
+
+  * As a [user type], I want to [action] so that [outcome].
 
 - [ ] **Step 2: [Title]**
   [Brief description]
-
-...
 ```
+
+User stories are helpful for user-facing features.
+
+Do not force them for:
+
+- setup work
+- configuration
+- internal refactors
+
+---
 
 ### Step 4: Register in Manifest
 
@@ -65,20 +103,39 @@ Update `tandem.json`:
 
 ```json
 {
-  "path": "dev-docs/ROADMAP.md",
-  "scope": "general",
-  "purpose": "Ordered implementation steps with checkboxes and user stories",
-  "tags": ["roadmap", "planning"]
+"path": "dev-docs/ROADMAP.md",
+"scope": "general",
+"purpose": "Ordered implementation steps with checkboxes and user stories",
+"tags": ["roadmap", "planning"]
 }
 ```
 
+---
+
 ### Step 5: Review with Developer
 
-Walk through the roadmap. Get feedback on ordering, scope, and step size. Revise as needed.
+Walk through the roadmap together.
 
-## Design Notes
+- check ordering
+- check step size
+- adjust anything unclear
 
-- Keep steps minimal. No time estimates or complexity scores.
-- The checkbox format (`- [ ]` / `- [x]`) is what `/pair-program` uses to mark steps complete.
-- Steps can reference specific architecture components when it adds clarity, but this isn't required. `/pair-program` reads both documents regardless.
-- Never use em dashes in any written content. Use commas, periods, colons, or semicolons instead.
+This should feel like a plan they would actually follow.
+
+---
+
+## Important Reminders
+
+- Keep steps small and focused
+- Each step should have a clear deliverable
+- Do not include time estimates or complexity scoring
+- Do not force user stories where they do not fit
+- Do not over-plan. This is a working plan, not a perfect one
+- Keep everything grounded in the PRD and architecture
+- Use the checkbox format exactly (`- [ ]`, `- [x]`)
+- Never use em dashes
+- Avoid vague steps like "build backend" or "set up frontend". Be specific.
+- Each step should result in something tangible that works or can be tested.
+- Do not reorder steps for aesthetics. Follow actual dependencies.
+- Do not assume the developer knows what a step means. Write it clearly.
+- Write steps so they can be used directly with /pair-program without extra interpretation.
